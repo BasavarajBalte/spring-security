@@ -1,0 +1,6 @@
+//key generate HTTPS
+
+
+tomcat dir -> bin
+
+tomcat\bin\>keytool -genkey -alias tomcat -keyalg RSA -keystore d:\tomcat\bin\tomcat(path and name of key file)

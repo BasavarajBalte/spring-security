@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context-3.2.xsd
+		http://www.springframework.org/schema/security
+		http://www.springframework.org/schema/security/spring-security.xsd">
+
+	<http auto-config="true" use-expressions="true">
+		<!-- <intercept-url pattern="/login.html" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+		<intercept-url pattern="/loginFailed.html" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+		<intercept-url pattern="/logout.html" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+		<intercept-url pattern="/403.html" access="IS_AUTHENTICATED_ANONYMOUSLY"/> -->
+		
+		<intercept-url pattern="/login.html" access="permitAll" requires-channel="https"/>
+		<intercept-url pattern="/loginFailed.html" access="permitAll" requires-channel="https"/>
+		<intercept-url pattern="/logout.html" access="permitAll" requires-channel="https"/>
+		<intercept-url pattern="/403.html" access="permitAll" requires-channel="https"/>
+		
+		<!-- 
+		this will give error when use-expressions = "true"
+		<intercept-url pattern="/**" access="ROLE_USER" /> 
+		below hasRole if expression enabled.
+		 -->
+		<intercept-url pattern="/**" access="hasRole('ROLE_USER')" />
+		
+		<!-- basic authontication <http-basic/> -->
+		<!-- custom login -->
+		<form-login login-page="/login.html" authentication-failure-url="/loginFailed.html"/>
+		<logout logout-success-url="/logout.html"/>
+		
+		<!-- access denied handler -->
+		<access-denied-handler error-page="/403.html"/>
+	</http>
+
+
+	<!--  <authentication-manager>
+		<authentication-provider>
+			<user-service>
+				<user name="raj" password="test" authorities="ROLE_USER" />
+				<user name="ram" password="test" authorities="ROLE_USER" />
+			</user-service>
+		</authentication-provider>
+	</authentication-manager> -->
+	<authentication-manager>
+		<!-- <authentication-provider user-service-ref="userDetailsService"/> or-->
+		<authentication-provider>
+			<!-- <password-encoder hash="md5"> </password-encoder> -->
+			<password-encoder hash="bcrypt"></password-encoder>
+			<jdbc-user-service data-source-ref="dataSource"/>
+		</authentication-provider>
+	</authentication-manager>
+	
+
+	<beans:bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<beans:property name="driverClassName"
+			value="org.postgresql.Driver"></beans:property>
+		<beans:property name="url"
+			value="jdbc:postgresql://localhost:5432/test"></beans:property>
+		<beans:property name="username" value="postgres"></beans:property>
+		<beans:property name="password" value="admin"></beans:property>
+	</beans:bean>
+	
+	<!-- <beans:bean id="userDetailsService" class="org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl">
+		<beans:property name="dataSource" ref="dataSource"></beans:property>
+	</beans:bean> -->
+</beans:beans>
